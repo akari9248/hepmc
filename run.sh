@@ -6,13 +6,13 @@ baseoutput="/eos/cms/store/group/phys_smp/ec/shuangyu"
 ptmin=600
 ptmax=800
 spin="on"
-output="cms"
+env="cms"
 
 for arg in "$@"; do
     key="${arg%%=*}"
     value="${arg#*=}"
     case "$key" in
-        chunknum|events|baseoutput|ptmin|ptmax|spin|output)
+        chunknum|events|baseoutput|ptmin|ptmax|spin|env)
             declare "$key=$value"
             ;;
         *)
@@ -28,7 +28,7 @@ echo "  baseoutput= $baseoutput"
 echo "  ptmin     = $ptmin"
 echo "  ptmax     = $ptmax"
 echo "  spin      = $spin"
-echo "  cms       = $output"
+echo "  env       = $output"
 
 ########## update grid #########
 voms-proxy-init -voms cms -rfc -out x509up
@@ -43,9 +43,9 @@ while [ -d "$outputDir" ]; do
 done
 
 outputenv=""
-if [[ "${output}" == "cms" ]]; then
+if [[ "${env}" == "cms" ]]; then
    outputenv="root://eoscms.cern.ch/"
-elif [[ "${output}" == "private" ]]; then
+elif [[ "${env}" == "private" ]]; then
    outputenv="root://eosuser.cern.ch/"
 fi
 
@@ -78,7 +78,7 @@ fi
 update_file_line "${herwiginfile}" 155 "saverun ${configname} EventGenerator"
 # compile 
 echo "compile herwig in file"
-singularity run /afs/cern.ch/user/s/shuangyu/herwig730.sif Herwig read $herwiginfile
+singularity run /afs/cern.ch/user/s/shuangyu/public/herwig730.sif Herwig read $herwiginfile
 cd ..
 
 ########## get random num ##########
@@ -91,9 +91,15 @@ update_file_line "$condor_hepmc_file" 5 "arguments = \$(Process) \$(randomnum) \
 update_file_line "$condor_gensim_file" 9 "output_destination = ${outputenv}${outputDir}/Chunk\$(Process)"
 
 ########## create output folder  ##########
-if ! eos ls "$outputDir" &> /dev/null; then
+cmd_prefix="eos"
+if [[ $env == "private" ]]; then
+    cmd_prefix=""
+fi
+
+if ! ${cmd_prefix} ls "$outputDir" &> /dev/null; then
     echo "Directory does not exist, creating: $outputDir"
-    if ! eos mkdir -p "$outputDir"; then
+    echo ${cmd_prefix} mkdir "$outputDir"
+    if ! ${cmd_prefix} mkdir "$outputDir"; then
         echo "[ERROR] Failed to create directory. Check permissions or storage quota."
         exit 1
     fi
@@ -108,11 +114,11 @@ fi
 
 for ((i=0; i<chunknum; i++)); do
     # chunk_index=$((start_index + i))
-    if ! eos ls "$outputDir/Chunk${i}" &> /dev/null; then
+    if ! ${cmd_prefix} ls "$outputDir/Chunk${i}" &> /dev/null; then
 	    if (( i % 50 == 0 )); then
-            echo "Directory creating: $outputDir/Chunk${i}"
-        fi
-        if ! eos mkdir -p "$outputDir/Chunk${i}"; then
+                echo "Directory creating: $outputDir/Chunk${i}"
+            fi
+        if ! ${cmd_prefix} mkdir "$outputDir/Chunk${i}"; then
 	   echo "[ERROR] Failed to create directory. Check permissions or storage quota."
            exit 1
         fi
@@ -121,7 +127,7 @@ for ((i=0; i<chunknum; i++)); do
     fi
 
     logDir="$outputDir/Chunk${i}/log"
-    if ! eos mkdir -p "$logDir"; then
+    if ! ${cmd_prefix} mkdir "$logDir"; then
         echo "[ERROR] Failed to create log directory: $logDir"
 	exit 1
     fi
