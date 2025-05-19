@@ -1,0 +1,22 @@
+universe = vanilla
+executable = gensim.sh
+getenv = True
+arguments = /afs/cern.ch/user/s/shuangyu/CMSSW_12_4_20/src /afs/cern.ch/user/s/shuangyu/CMSSW_12_4_16/src /afs/cern.ch/user/s/shuangyu/CMSSW_13_0_13/src /afs/cern.ch/user/s/shuangyu/CMSSW_14_0_15/src $(inputHepMC) $(randomnum)
+
+Should_Transfer_Files = YES
+Transfer_Input_Files = gensim.py,hlt.py,reco.py,pat.py,getinfo.py
+Transfer_Output_Files = pat-S$(randomnum).root,jetsinfo-S$(randomnum).root
+output_destination = root://eoscms.cern.ch//eos/cms/store/group/phys_smp/ec/shuangyu/Run3Summer22EE_13TeV6_0_spinoff_600_800_730_950_ext4/Chunk$(Process)
+# when_to_transfer_output = ON_EXIT
+
+output = log/$(Cluster)_$(Process)_gensim.out
+error = log/$(Cluster)_$(Process)_gensim.err
+log = log/$(Cluster)_$(Process)_gensim.log
+# MY.SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64"
+
+x509userproxy = x509up
++JobFlavour = "tomorrow"
++RequestMemory = 10240
+max_retries = 2
+requirements = Machine =!= LastRemoteHost
+queue inputHepMC,randomnum from inhepmc.txt

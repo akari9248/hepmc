@@ -1,0 +1,177 @@
+read snippets/PPCollider.in
+##################################################
+# TheP8I interface for Lund hadronization
+# Comment it if you need Cluster hadronization
+##################################################
+#mkdir /TheP8I
+#create TheP8I::StringFragmentation  /TheP8I/Handlers/StringFrag/StringFragmenter    libTheP8I.so ##create shi qian mian de gei hou mian de 
+#create TheP8I::TheP8IStrategy  /TheP8I/StdStrategy libTheP8I.so
+#cd /Herwig/Generators
+#set EventGenerator:EventHandler:HadronizationHandler /TheP8I/Handlers/StringFrag/StringFragmenter
+#set EventGenerator:Strategy /TheP8I/StdStrategy
+
+##################################################
+# Dipole setting
+# Comment it if you need angular shower model
+##################################################
+#read snippets/DipoleShowerFiveFlavours.in
+#set /Herwig/EventHandlers/EventHandler:CascadeHandler /Herwig/DipoleShower/DipoleShowerHandler ##Blood:zhi,canshu
+
+##################################################
+# CH3 PDF https://github.com/cms-sw/cmssw/blob/80d1847d553aa8441160990f9a2cf461a6182c05/Configuration/Generator/python/Herwig7Settings/Herwig7CH3TuneSettings_cfi.py#L31
+##################################################
+cd /Herwig/Partons ##Blood:wen jian jia
+create ThePEG::LHAPDF PDFSet_nnlo ThePEGLHAPDF.so
+set /Herwig/Partons/PDFSet_nnlo:PDFName NNPDF31_nnlo_as_0118.LHgrid
+set /Herwig/Partons/PDFSet_nnlo:RemnantHandler HadronRemnants
+set /Herwig/Particles/p+:PDF PDFSet_nnlo
+set /Herwig/Particles/pbar-:PDF PDFSet_nnlo
+set /Herwig/Partons/PPExtractor:FirstPDF PDFSet_nnlo
+set /Herwig/Partons/PPExtractor:SecondPDF PDFSet_nnlo
+set /Herwig/Shower/ShowerHandler:PDFA PDFSet_nnlo
+set /Herwig/Shower/ShowerHandler:PDFB PDFSet_nnlo
+create ThePEG::LHAPDF PDFSet_lo ThePEGLHAPDF.so
+set /Herwig/Partons/PDFSet_lo:PDFName NNPDF31_lo_as_0130.LHgrid
+set /Herwig/Partons/PDFSet_lo:RemnantHandler HadronRemnants
+set /Herwig/Shower/ShowerHandler:PDFARemnant PDFSet_lo
+set /Herwig/Shower/ShowerHandler:PDFBRemnant PDFSet_lo
+set /Herwig/Partons/MPIExtractor:FirstPDF PDFSet_lo
+set /Herwig/Partons/MPIExtractor:SecondPDF PDFSet_lo
+
+##################################################
+# CH3 AlphaS !!!
+##################################################
+set /Herwig/Shower/AlphaQCDFSR:AlphaIn 0.118
+set /Herwig/Shower/AlphaQCDISR:AlphaIn 0.118
+##################################################
+# CH3 MPI https://github.com/cms-sw/cmssw/blob/80d1847d553aa8441160990f9a2cf461a6182c05/Configuration/Generator/python/Herwig7Settings/Herwig7CH3TuneSettings_cfi.py#L31
+##################################################
+set /Herwig/Hadronization/ColourReconnector:ReconnectionProbability 0.4712
+set /Herwig/UnderlyingEvent/MPIHandler:pTmin0 3.04
+set /Herwig/UnderlyingEvent/MPIHandler:InvRadius 1.284
+set /Herwig/UnderlyingEvent/MPIHandler:Power 0.1362
+
+##################################################
+# StableParticlesForDetector https://github.com/cms-sw/cmssw/blob/80d1847d553aa8441160990f9a2cf461a6182c05/GeneratorInterface/Herwig7Interface/test/PPToEE_LO_TuneCH3_13TeV_herwig7_matchbox_cfg.py#L160
+##################################################
+set /Herwig/Decays/DecayHandler:MaxLifeTime 10*mm
+set /Herwig/Decays/DecayHandler:LifeTimeOption Average
+
+##################################################
+# PSWeights https://github.com/cms-sw/cmssw/blob/80d1847d553aa8441160990f9a2cf461a6182c05/Configuration/Generator/python/Herwig7Settings/Herwig7PSWeightsSettings_cfi.py#L7
+##################################################
+# cd /Herwig/Shower
+# do /Herwig/Shower/ShowerHandler:AddVariation RedHighAll 1.141 1.141  All
+# do /Herwig/Shower/ShowerHandler:AddVariation RedLowAll 0.707 0.707 All
+# do /Herwig/Shower/ShowerHandler:AddVariation DefHighAll 2 2 All
+# do /Herwig/Shower/ShowerHandler:AddVariation DefLowAll 0.5 0.5 All
+# do /Herwig/Shower/ShowerHandler:AddVariation ConHighAll 4 4 All
+# do /Herwig/Shower/ShowerHandler:AddVariation ConLowAll 0.25 0.25 All
+# do /Herwig/Shower/ShowerHandler:AddVariation RedHighHard 1.141 1.141  Hard
+# do /Herwig/Shower/ShowerHandler:AddVariation RedLowHard 0.707 0.707 Hard
+# do /Herwig/Shower/ShowerHandler:AddVariation DefHighHard 2 2 Hard
+# do /Herwig/Shower/ShowerHandler:AddVariation DefLowHard 0.5 0.5 Hard
+# do /Herwig/Shower/ShowerHandler:AddVariation ConHighHard 4 4 Hard
+# do /Herwig/Shower/ShowerHandler:AddVariation ConLowHard 0.25 0.25 Hard
+# do /Herwig/Shower/ShowerHandler:AddVariation RedHighSecondary 1.141 1.141  Secondary
+# do /Herwig/Shower/ShowerHandler:AddVariation RedLowSecondary 0.707 0.707 Secondary
+# do /Herwig/Shower/ShowerHandler:AddVariation DefHighSecondary 2 2 Secondary
+# do /Herwig/Shower/ShowerHandler:AddVariation DefLowSecondary 0.5 0.5 Secondary
+# do /Herwig/Shower/ShowerHandler:AddVariation ConHighSecondary 4 4 Secondary
+# do /Herwig/Shower/ShowerHandler:AddVariation ConLowSecondary 0.25 0.25 Secondary
+# set /Herwig/Shower/SplittingGenerator:Detuning 2.0
+
+##################################################
+# LHC and Process
+##################################################
+set /Herwig/EventHandlers/EventHandler:LuminosityFunction:Energy 13600.0
+mkdir /Herwig/Weights 
+cd /Herwig/Weights
+create ThePEG::ReweightMinPT reweightMinPT ReweightMinPT.so 
+cd /Herwig/MatrixElements/ 
+#create Herwig::MEQCD2to2 MEQCD2to2
+insert SubProcess:MatrixElements[0] MEQCD2to2
+set /Herwig/MatrixElements/MEQCD2to2:Process 0 #94
+get /Herwig/MatrixElements/MEQCD2to2:Process
+#insert SubProcess:Preweights[0] /Herwig/Weights/reweightMinPT 
+##!!!!!pt range
+set /Herwig/Cuts/JetKtCut:MinKT 1000.*GeV #98
+get /Herwig/Cuts/JetKtCut:MinKT
+set /Herwig/Cuts/JetKtCut:MaxKT 1400.*GeV #100
+get /Herwig/Cuts/JetKtCut:MaxKT
+##!!!!!pt range
+set /Herwig/Cuts/Cuts:MHatMin  0.0*GeV 
+set /Herwig/Cuts/Cuts:X1Min    1e-07 
+set /Herwig/Cuts/Cuts:X2Min    1e-07 
+set /Herwig/Cuts/MassCut:MinM  0.0*GeV 
+#set /Herwig/Weights/reweightMinPT:Power 4.5 
+#set /Herwig/Weights/reweightMinPT:Scale 15*GeV
+
+##################################################
+# spin correlation on or off
+##################################################
+set /Herwig/EventHandlers/EventHandler:CascadeHandler:SpinCorrelations Yes #113
+#set /Herwig/EventHandlers/EventHandler:CascadeHandler:SpinCorrelations No
+get /Herwig/Shower/ShowerHandler:SpinCorrelations
+get /Herwig/DipoleShower/DipoleShowerHandler:SpinCorrelations
+get /Herwig/EventHandlers/EventHandler:CascadeHandler:SpinCorrelations
+
+##################################################
+# hadronization on or off
+##################################################
+cd /Herwig/EventHandlers
+##set /Herwig/EventHandlers/EventHandler:HadronizationHandler NULL
+get /Herwig/EventHandlers/EventHandler:HadronizationHandler
+
+##################################################
+# DecayHandler selection
+##################################################
+##set /Herwig/EventHandlers/EventHandler:DecayHandler NULL
+get /Herwig/EventHandlers/EventHandler:DecayHandler
+##do /Herwig/Particles/h0:SelectDecayModes h0->g,g;
+###########!!!!!!!!!!!read kongzhishuaibian.in
+###########!!!!!!!!!!!do /Herwig/Particles/Bstar_00:SelectDecayModes none;
+##do /Herwig/Particles/Z0:SelectDecayModes Z0->e-,e+;
+##do /Herwig/Particles/h0:PrintDecayModes
+##do /Herwig/Particles/Z0:PrintDecayModes
+
+##################################################
+## prepare for Rivet analysis or HepMC output
+## when running with parton shower
+##################################################
+cd /Herwig/Analysis
+set /Herwig/Analysis/Basics:CheckQuark No
+#create ThePEG::RivetAnalysis RivetAnalysis RivetAnalysis.so
+#cd /Herwig/Generators
+#insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/RivetAnalysis
+#insert /Herwig/Analysis/RivetAnalysis:Analyses 0 events
+read snippets/HepMC.in
+set /Herwig/Analysis/HepMC:PrintEvent 500 #149
+
+##################################################
+# Save run for later usage with 'Herwig run'
+##################################################
+cd /Herwig/Generators
+saverun FlatQCD-TuneCH3-AngularCluster13TeV6HepMC_spinon_1000_1400 EventGenerator
+
+##check
+##########get EventGenerator:EventHandler:HadronizationHandler:StringZ_aLund 0.68
+##########get EventGenerator:EventHandler:HadronizationHandler:StringZ_bLund 0.98
+#get EventGenerator:EventHandler:HadronizationHandler:StringZ_sigma
+##########get EventGenerator:EventHandler:HadronizationHandler:StringPT_sigma 0.335
+##########get EventGenerator:EventHandler:HadronizationHandler:StringZ_aExtraSQuark 0
+#get EventGenerator:EventHandler:HadronizationHandler:StringZ_bExtraDiquark
+##########get EventGenerator:EventHandler:HadronizationHandler:StringZ_aExtraDiquark 0.97
+##########get EventGenerator:EventHandler:HadronizationHandler:StringZ_rFactC 1.32
+##########get EventGenerator:EventHandler:HadronizationHandler:StringZ_rFactB 0.855
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_probStoUD 0.217
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_probQQtoQ 0.081
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_probSQtoQQ 0.915
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_probQQ1toQQ0 0.0275
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_etaSup 0.6
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_etaPrimeSup 0.12
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_popcornRate 0.5
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_mesonUDvector 0.5
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_mesonSvector 0.55
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_mesonCvector 0.88
+##########get EventGenerator:EventHandler:HadronizationHandler:StringFlav_mesonBvector 2.2

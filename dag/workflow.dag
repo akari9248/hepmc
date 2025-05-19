@@ -1,0 +1,5 @@
+JOB HepMC condor_hepmc.jdl
+JOB GEN-SIM condor_gensim.jdl
+PARENT HepMC CHILD GEN-SIM
+RETRY HepMC 3
+RETRY GEN-SIM 3

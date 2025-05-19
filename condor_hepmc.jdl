@@ -1,0 +1,25 @@
+outputName = $(Cluster)_$(Process)
+universe = vanilla
+executable = hepmc.sh
+
+arguments = $(Process) $(randomnum) $(eventsnum) FlatQCD-TuneCH3-AngularCluster13TeV6HepMC_spinoff_600_800.run
+Requirements = HasSingularity
++SingularityImage = "/afs/cern.ch/user/s/shuangyu/public/herwig730.sif"
+
+Should_Transfer_Files = YES
+Transfer_Output_Files = FlatQCD-TuneCH3-AngularCluster13TeV6HepMC-S$(randomnum).hepmc
+# Transfer_Output_Files = ""
+Transfer_Input_Files = herwigconfig/FlatQCD-TuneCH3-AngularCluster13TeV6HepMC_spinoff_600_800.run
+output_destination = root://eoscms.cern.ch//eos/cms/store/group/phys_smp/ec/shuangyu/Run3Summer22EE_13TeV6_0_spinoff_600_800_730_950_ext4/Chunk$(Process)
+
+output = log/$(outputName)_hepmc.out
+error  = log/$(outputName)_hepmc.err
+log    = log/$(outputName)_hepmc.log
+
++JobFlavour = "tomorrow"
+# +MaxRuntime = 3600
++RequestMemory = 4096
+
+max_retries = 2
+requirements = Machine =!= LastRemoteHost
+queue randomnum,eventsnum from random_numbers.txt
